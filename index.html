@@ -119,7 +119,7 @@
       </div><div class="countdown-note" id="countdownNote">Fecha provisional: 26 de noviembre de 2026 · 09:00 h (sujeta a confirmación)</div>
       <a class="btn btn-secondary calendar-link" id="calendarLink" href="#" target="_blank" rel="noopener">＋ Agregar a Google Calendar</a>
     </div>
-    <div class="hero-art reveal" role="img" aria-label="Ilustración tecnológica: ola de malla neón con radar y circuitos">
+    <div class="hero-art reveal" role="img" aria-label="Ilustración tecnológica: ola de malla neón con radar y circuitos, y el año 2026 al centro">
   <canvas class="hero-bg"></canvas>
   <div class="glow"></div>
   <canvas class="hero-wave"></canvas>
@@ -417,7 +417,7 @@ navAnchors.forEach(a=>{const s=document.querySelector(a.getAttribute("href"));if
       W = r.width; H = r.height; U = Math.min(W, H) * .36; cx = W * .5; cy = H * .52;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       [bg, cv].forEach(function (c) { c.width = Math.max(1, Math.round(W * dpr)); c.height = Math.max(1, Math.round(H * dpr)); });
-      parts.length = 0; drawBg();
+      parts.length = 0; dust = null; drawBg();
       if (!running) frame(performance.now() + 2000);
     }
 
@@ -548,12 +548,74 @@ navAnchors.forEach(a=>{const s=document.querySelector(a.getAttribute("href"));if
       }
     }
 
+    /* ---------- Año 2025 → 2026 (desintegración tipo Telegram) ---------- */
+    var Y_OLD = '2025', Y_NEW = '2026';
+    var Y_HOLD = 1.6;   // segundos que se ve 2025 antes de desintegrarse
+    var Y_DUST = 1.8;   // duración de la desintegración
+    var Y_IN = 1.0;     // duración de la aparición de 2026
+    var yT = reduce ? 99 : 0, dust = null;
+
+    function yearFont() { return '800 ' + Math.round(U * .28) + 'px Inter, system-ui, sans-serif'; }
+    function yearPos() { return [cx - U * .1, cy + U * .03]; }
+    function yearFill(c, x, w) {
+      var g = c.createLinearGradient(x - w / 2, 0, x + w / 2, 0);
+      g.addColorStop(0, '#22d3ee'); g.addColorStop(.55, '#7b8cff'); g.addColorStop(1, '#c084fc');
+      return g;
+    }
+    function drawYearText(txt, alpha, scale, dy) {
+      var c = ctx, p = yearPos();
+      c.save(); c.globalAlpha = alpha; c.translate(p[0], p[1] + dy); c.scale(scale, scale);
+      c.font = yearFont(); c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillStyle = yearFill(c, 0, c.measureText(txt).width);
+      c.shadowColor = 'rgba(34,211,238,.5)'; c.shadowBlur = 16;
+      c.fillText(txt, 0, 0); c.restore();
+    }
+    // Convierte el texto "2025" en partículas (una por cada 2 px con tinta)
+    function makeDust() {
+      var p = yearPos(), font = yearFont(), o = document.createElement('canvas'), oc = o.getContext('2d');
+      oc.font = font;
+      var w = Math.ceil(oc.measureText(Y_OLD).width) + 8, h = Math.ceil(U * .3 * 1.4), st = 2, out = [];
+      o.width = w; o.height = h;
+      oc.font = font; oc.textAlign = 'center'; oc.textBaseline = 'middle';
+      oc.fillStyle = yearFill(oc, w / 2, w - 8); oc.fillText(Y_OLD, w / 2, h / 2);
+      var d = oc.getImageData(0, 0, w, h).data;
+      for (var y = 0; y < h; y += st) for (var x = 0; x < w; x += st) {
+        var k = (y * w + x) * 4;
+        if (d[k + 3] < 120) continue;
+        out.push({
+          x: p[0] - w / 2 + x, y: p[1] - h / 2 + y, c: d[k] + ',' + d[k + 1] + ',' + d[k + 2],
+          delay: (x / w) * .9 + Math.random() * .25,          // se deshace de izquierda a derecha
+          vx: 20 + Math.random() * 70, vy: -(15 + Math.random() * 60),
+          life: .5 + Math.random() * .7, ph: Math.random() * TAU
+        });
+      }
+      return out;
+    }
+    function drawYear() {
+      if (yT < Y_HOLD) { drawYearText(Y_OLD, ss(0, .5, yT), 1, 0); }
+      var td = yT - Y_HOLD;
+      if (td >= 0 && td < Y_DUST) {
+        if (!dust) dust = makeDust();
+        for (var n = 0; n < dust.length; n++) {
+          var q = dust[n], a = td - q.delay;
+          if (a > q.life) continue;
+          if (a < 0) { ctx.fillStyle = 'rgb(' + q.c + ')'; ctx.fillRect(q.x, q.y, 2, 2); continue; }
+          var k = a / q.life, s = 2 * (1 - k * .6);
+          ctx.fillStyle = 'rgba(' + q.c + ',' + (1 - k).toFixed(2) + ')';
+          ctx.fillRect(q.x + q.vx * a + Math.sin(q.ph + a * 6) * 4, q.y + q.vy * a - 20 * a * a, s, s);
+        }
+      } else if (td >= Y_DUST) dust = null;
+      var ti = yT - (Y_HOLD + Y_DUST * .55);
+      if (ti > 0) { var e = ss(0, Y_IN, ti); drawYearText(Y_NEW, e, .85 + .15 * e, 10 * (1 - e)); }
+    }
+
     var last = performance.now();
     function frame(now) {
       var time = (now - t0) / 1000, dt = Math.min(.05, (now - last) / 1000); last = now;
+      if (running) yT += dt;
       mx += (tmx - mx) * .06; my += (tmy - my) * .06;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-      drawRadar(time); drawWave(time); if (!reduce) drawParticles(dt);
+      drawRadar(time); drawYear(); drawWave(time); if (!reduce) drawParticles(dt);
       if (running) raf = requestAnimationFrame(frame);
     }
     function start() { if (running || reduce) return; running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
