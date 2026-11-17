@@ -197,7 +197,7 @@
           <div class="field full"><label for="teamName">Nombre del equipo *</label><input id="teamName" name="teamName" placeholder="Ej. Byte Builders" required maxlength="80"></div>
           <div class="field"><label for="leaderName">Nombre completo del líder * <span class="leader-badge">Líder</span></label><input id="leaderName" name="leaderName" placeholder="Nombre y apellidos" required autocomplete="name"></div>
           <div class="field"><label for="leaderEmail">Correo electrónico del líder *</label><input id="leaderEmail" name="leaderEmail" type="email" placeholder="equipo@correo.com" required autocomplete="email"></div>
-          <div class="field"><label for="leaderPhone">Teléfono / WhatsApp *</label><input id="leaderPhone" name="leaderPhone" type="tel" placeholder="951 123 4567" required autocomplete="tel" inputmode="tel" pattern="[0-9+() .-]{10,20}"><small>Incluye lada si corresponde.</small></div>
+          <div class="field"><label for="leaderPhone">Teléfono / WhatsApp *</label><input id="leaderPhone" name="leaderPhone" type="tel" placeholder="951 123 4567" required autocomplete="tel" inputmode="tel" pattern="[0-9+\(\) .\-]{10,20}"><small>Incluye lada si corresponde.</small></div>
           <div class="field"><label for="affiliation">Semestre / carrera / institución <span>(opcional)</span></label><input id="affiliation" name="affiliation" placeholder="Ej. 5.º semestre · Ingeniería en Sistemas"></div>
           <hr class="form-divider">
           <div class="field"><label for="member1">Participante 1 — líder *</label><input id="member1" name="member1" placeholder="Se completa con el nombre del líder" required readonly><small>Se sincroniza automáticamente con el nombre del líder.</small></div>
@@ -344,7 +344,7 @@ form.addEventListener("submit",event=>{
   const required=[...form.querySelectorAll("[required]")];
   let firstInvalid=null;
   required.forEach(field=>{field.setCustomValidity("");if(!field.value.trim()||!field.checkValidity()){if(!firstInvalid)firstInvalid=field;}});
-  if(firstInvalid){firstInvalid.focus();firstInvalid.reportValidity();status.textContent="Revisa los campos obligatorios, los cuatro integrantes, sus números de control y sus playeras.";status.classList.add("error");return;}
+  if(firstInvalid){firstInvalid.focus();firstInvalid.reportValidity();const lbl=form.querySelector('label[for="'+firstInvalid.id+'"]');status.textContent="Revisa este campo: "+(lbl?lbl.textContent.replace(/\s*\*.*$/,"").trim():"campo obligatorio")+(firstInvalid.id.startsWith("control")?" (8 dígitos, ej. 21190123).":".");status.classList.add("error");return;}
   const data=Object.fromEntries(new FormData(form).entries());
   submitting=true;
   const submitButton=form.querySelector('button[type="submit"]');
