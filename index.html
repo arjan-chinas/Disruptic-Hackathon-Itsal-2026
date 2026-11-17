@@ -201,13 +201,13 @@
           <div class="field"><label for="affiliation">Semestre / carrera / institución <span>(opcional)</span></label><input id="affiliation" name="affiliation" placeholder="Ej. 5.º semestre · Ingeniería en Sistemas"></div>
           <hr class="form-divider">
           <div class="field"><label for="member1">Participante 1 — líder *</label><input id="member1" name="member1" placeholder="Se completa con el nombre del líder" required readonly><small>Se sincroniza automáticamente con el nombre del líder.</small></div>
-          <div class="field"><label for="control1">No. de control — participante 1 *</label><input id="control1" name="control1" placeholder="Ej. 21190123" required maxlength="9" pattern="[A-Za-z]?[0-9]{8}" inputmode="text" autocomplete="off" title="8 dígitos; puede iniciar con una letra (ej. C21190123)"></div>
+          <div class="field"><label for="control1">No. de control — participante 1 *</label><input id="control1" name="control1" placeholder="Ej. 221020110" required maxlength="10" pattern="[A-Za-z]?[0-9]{8,9}" inputmode="text" autocomplete="off" title="8 o 9 dígitos; puede iniciar con una letra (ej. 221020110)"></div>
           <div class="field"><label for="member2">Participante 2 *</label><input id="member2" name="member2" placeholder="Nombre completo" required></div>
-          <div class="field"><label for="control2">No. de control — participante 2 *</label><input id="control2" name="control2" placeholder="Ej. 21190123" required maxlength="9" pattern="[A-Za-z]?[0-9]{8}" inputmode="text" autocomplete="off" title="8 dígitos; puede iniciar con una letra (ej. C21190123)"></div>
+          <div class="field"><label for="control2">No. de control — participante 2 *</label><input id="control2" name="control2" placeholder="Ej. 221020110" required maxlength="10" pattern="[A-Za-z]?[0-9]{8,9}" inputmode="text" autocomplete="off" title="8 o 9 dígitos; puede iniciar con una letra (ej. 221020110)"></div>
           <div class="field"><label for="member3">Participante 3 *</label><input id="member3" name="member3" placeholder="Nombre completo" required></div>
-          <div class="field"><label for="control3">No. de control — participante 3 *</label><input id="control3" name="control3" placeholder="Ej. 21190123" required maxlength="9" pattern="[A-Za-z]?[0-9]{8}" inputmode="text" autocomplete="off" title="8 dígitos; puede iniciar con una letra (ej. C21190123)"></div>
+          <div class="field"><label for="control3">No. de control — participante 3 *</label><input id="control3" name="control3" placeholder="Ej. 221020110" required maxlength="10" pattern="[A-Za-z]?[0-9]{8,9}" inputmode="text" autocomplete="off" title="8 o 9 dígitos; puede iniciar con una letra (ej. 221020110)"></div>
           <div class="field"><label for="member4">Participante 4 *</label><input id="member4" name="member4" placeholder="Nombre completo" required></div>
-          <div class="field"><label for="control4">No. de control — participante 4 *</label><input id="control4" name="control4" placeholder="Ej. 21190123" required maxlength="9" pattern="[A-Za-z]?[0-9]{8}" inputmode="text" autocomplete="off" title="8 dígitos; puede iniciar con una letra (ej. C21190123)"></div>
+          <div class="field"><label for="control4">No. de control — participante 4 *</label><input id="control4" name="control4" placeholder="Ej. 221020110" required maxlength="10" pattern="[A-Za-z]?[0-9]{8,9}" inputmode="text" autocomplete="off" title="8 o 9 dígitos; puede iniciar con una letra (ej. 221020110)"></div>
           <hr class="form-divider">
           <div class="field full shirt-head"><label>Playeras del equipo *</label><small>Elige el corte y la talla de cada participante. El número entre paréntesis es la talla equivalente.</small></div>
           <div class="shirt-list" id="shirtList"></div>
@@ -344,7 +344,7 @@ form.addEventListener("submit",event=>{
   const required=[...form.querySelectorAll("[required]")];
   let firstInvalid=null;
   required.forEach(field=>{field.setCustomValidity("");if(!field.value.trim()||!field.checkValidity()){if(!firstInvalid)firstInvalid=field;}});
-  if(firstInvalid){firstInvalid.focus();firstInvalid.reportValidity();const lbl=form.querySelector('label[for="'+firstInvalid.id+'"]');status.textContent="Revisa este campo: "+(lbl?lbl.textContent.replace(/\s*\*.*$/,"").trim():"campo obligatorio")+(firstInvalid.id.startsWith("control")?" (8 dígitos, ej. 21190123).":".");status.classList.add("error");return;}
+  if(firstInvalid){firstInvalid.focus();firstInvalid.reportValidity();const lbl=form.querySelector('label[for="'+firstInvalid.id+'"]');status.textContent="Revisa este campo: "+(lbl?lbl.textContent.replace(/\s*\*.*$/,"").trim():"campo obligatorio")+(firstInvalid.id.startsWith("control")?" (8 o 9 dígitos, ej. 221020110).":".");status.classList.add("error");return;}
   const data=Object.fromEntries(new FormData(form).entries());
   submitting=true;
   const submitButton=form.querySelector('button[type="submit"]');
