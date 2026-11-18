@@ -339,8 +339,12 @@ const leaderName=document.getElementById("leaderName"),member1=document.getEleme
 leaderName.addEventListener("input",()=>{member1.value=leaderName.value;syncShirtNames();});
 const form=document.getElementById("teamForm"),status=document.getElementById("formStatus");
 let submitting=false;
+// REGISTRO CERRADO: cambia a false para volver a abrirlo.
+const REGISTRO_CERRADO=true;
+if(REGISTRO_CERRADO){form.querySelectorAll("input,select,button[type=submit]").forEach(el=>el.disabled=true);status.textContent="El registro de equipos está cerrado.";status.classList.add("error");}
 form.addEventListener("submit",event=>{
   event.preventDefault();
+  if(REGISTRO_CERRADO)return;
   if(submitting)return;
   status.className="form-status";
   const required=[...form.querySelectorAll("[required]")];
